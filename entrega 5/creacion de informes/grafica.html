@@ -1,182 +1,144 @@
 <!doctype html>
 <html>
-	<head>
-	</head>
+<head>
     <style>
-      body{
-        background: url(fondo.jpg);
-        background-size: cover;
-       }
+        body {
+            background: url(fondo.jpg) no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            color: white;
+        }
+        .contenedor {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+        .configuracion {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: left;
+        }
+        canvas {
+            display: block;
+            margin: 20px auto;
+            border-radius: 10px;
+            background: #222;
+        }
+        button {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
+</head>
+<body>
+    <div class="contenedor">
+        <div class="configuracion">
+            <h3>Configurar Porcentajes</h3>
+            <label>A:</label><input type="number" id="valorA" value="40" min="0" max="100"><br>
+            <label>B:</label><input type="number" id="valorB" value="30" min="0" max="100"><br>
+            <label>C:</label><input type="number" id="valorC" value="20" min="0" max="100"><br>
+            <label>D:</label><input type="number" id="valorD" value="10" min="0" max="100"><br>
+            <button onclick="actualizarGrafico()">Actualizar Gráfico</button>
+            <button onclick="generarAleatorio()">Generar Aleatorio</button>
+        </div>
+        <div id="contienegraficas"></div>
+    </div>
+    
+    <script>
+        class JVGrafica {
+            constructor(datos, selector) {
+                this.datos = datos;
+                this.selector = selector;
+                this.colores = this.generarColores(datos.length);
+            }
 
-	<body>
-		<div id="contienegraficas" ></div> <!-- Contenedor donde se insertarán los gráficos -->
-		<script>
-			// Definición de la clase JVGrafica
-			class JVGrafica {
-				constructor(datos, color, selector) {
-					// Constructor: inicializa la información necesaria para los gráficos
-					this.datos = datos; // Datos de los sectores del gráfico
-					this.color = color; // Color base (no utilizado directamente, pero conservado por diseño)
-					this.selector = selector; // Selector donde se inserta el gráfico en el DOM
-				}
+            generarColores(cantidad) {
+                return Array.from({ length: cantidad }, () => `hsl(${Math.random() * 360}, 80%, 60%)`);
+            }
 
-				tarta() {
-					// Método para dibujar un gráfico de pastel
-					let anchura = 512; // Ancho del lienzo
-					let altura = 512; // Alto del lienzo
-					let lienzo = document.createElement("canvas"); // Crear un elemento canvas
-					lienzo.width = anchura; // Configurar el ancho del lienzo
-					lienzo.height = altura; // Configurar el alto del lienzo
-					lienzo.style.border = "1px solid grey"; // Borde para visualizar el área del canvas
-                    lienzo.style.background = "url('saxo.jpg') no-repeat center center";
-                    lienzo.style.backgroundSize = "cover";
-					let contexto = lienzo.getContext("2d"); // Contexto de dibujo en 2D
-					let alturaletra = 15; // Espaciado de texto en los sectores
-
-					document.querySelector(this.selector).appendChild(lienzo); // Insertar el lienzo en el contenedor
-
-					let total = 0; // Calcular el total de los valores de los datos
-					this.datos.forEach(function(dato) { 
-						total += dato.valor; // Sumar todos los valores
-					});
-
-					let anguloinicial = 0; // Ángulo inicial para el primer sector
-
-					// Iterar sobre los datos para dibujar cada sector del gráfico
-					this.datos.forEach(function(dato) {
-						// Generar un tono de gris aleatorio entre 70 y 220
-						let gris = Math.floor(70 + Math.random() * 150); 
-						let colorGris = `rgb(${gris}, ${gris}, ${gris})`; // Crear color gris
-
-						let angulofinal = (dato.valor / total) * Math.PI * 2; // Calcular el ángulo final del sector
-
-						// Dibujar el sector
-						contexto.fillStyle = colorGris; // Establecer el color de relleno
-						contexto.beginPath(); // Iniciar un nuevo camino
-						contexto.moveTo(anchura / 2, altura / 2); // Moverse al centro del lienzo
-						contexto.arc(
-							anchura / 2,
-							altura / 2,
-							anchura / 2 - 50, // Radio del círculo
-							anguloinicial, // Ángulo inicial
-							anguloinicial + angulofinal // Ángulo final
-						);
-						contexto.lineTo(anchura / 2, altura / 2); // Cerrar el sector hacia el centro
-						contexto.fill(); // Rellenar el sector
-
-						// Calcular el ángulo medio para colocar el texto
-						let angulotexto = anguloinicial + angulofinal / 2; 
-						contexto.textAlign = "center"; // Alinear el texto al centro
-						contexto.fillStyle = "white"; // Texto de color blanco
-						contexto.fillText(
-							dato.texto, // Etiqueta del sector
-							anchura / 2 + Math.cos(angulotexto) * (anchura / 2 - 50) / 2,
-							altura / 2 + Math.sin(angulotexto) * (anchura / 2 - 50) / 2 - alturaletra
-						);
-
-						// Mostrar el valor numérico en el sector
-						contexto.fillText(
-							dato.valor,
-							anchura / 2 + Math.cos(angulotexto) * (anchura / 2 - 50) / 2,
-							altura / 2 + Math.sin(angulotexto) * (anchura / 2 - 50) / 2
-						);
-
-						// Mostrar el porcentaje del sector
-						contexto.fillText(
-							(dato.valor / total).toFixed(2) + " %",
-							anchura / 2 + Math.cos(angulotexto) * (anchura / 2 - 50) / 2,
-							altura / 2 + Math.sin(angulotexto) * (anchura / 2 - 50) / 2 + alturaletra
-						);
-
-						anguloinicial += angulofinal; // Actualizar el ángulo inicial para el siguiente sector
-					});
-				}
-
-				anillo() {
-					// Método para dibujar un gráfico de anillo
-					let anchura = 512;
-					let altura = 512;
-					let lienzo = document.createElement("canvas");
-					lienzo.width = anchura;
-					lienzo.height = altura;
-					lienzo.style.border = "1px solid grey";
-                    lienzo.style.background = "url('fondo.jpg') no-repeat center center";
-                    lienzo.style.backgroundSize = "cover";
-					let contexto = lienzo.getContext("2d");
-					let alturaletra = 15;
-
-					document.querySelector(this.selector).appendChild(lienzo);
-
-					let total = 0; // Calcular el total de los datos
-					this.datos.forEach(function(dato) {
-						total += dato.valor;
-					});
-
-					let anguloinicial = 0;
-
-					this.datos.forEach(function(dato) {
-						let gris = Math.floor(70 + Math.random() * 150); // Generar color gris
-						let colorGris = `rgb(${gris}, ${gris}, ${gris})`;
-
-						let angulofinal = (dato.valor / total) * Math.PI * 2; // Ángulo del sector
-
-						contexto.fillStyle = colorGris;
-						contexto.beginPath();
-						contexto.moveTo(anchura / 2, altura / 2);
-						contexto.arc(
-							anchura / 2,
-							altura / 2,
-							anchura / 2 - 50,
-							anguloinicial,
-							anguloinicial + angulofinal
-						);
-						contexto.lineTo(anchura / 2, altura / 2);
-						contexto.fill();
-
-						let angulotexto = anguloinicial + angulofinal / 2;
-						contexto.textAlign = "center";
-						contexto.fillStyle = "white";
-						contexto.fillText(
-							dato.texto,
-							anchura / 2 + Math.cos(angulotexto) * (anchura / 2 + 20) / 2,
-							altura / 2 + Math.sin(angulotexto) * (anchura / 2 + 20) / 2 - alturaletra
-						);
-						contexto.fillText(
-							dato.valor,
-							anchura / 2 + Math.cos(angulotexto) * (anchura / 2 + 20) / 2,
-							altura / 2 + Math.sin(angulotexto) * (anchura / 2 + 20) / 2
-						);
-						contexto.fillText(
-							(dato.valor / total).toFixed(2) + " %",
-							anchura / 2 + Math.cos(angulotexto) * (anchura / 2 + 20) / 2,
-							altura / 2 + Math.sin(angulotexto) * (anchura / 2 + 20) / 2 + alturaletra
-						);
-
-						anguloinicial += angulofinal;
-					});
-
-					// Crear el "agujero" en el centro utilizando globalCompositeOperation
-                    contexto.globalCompositeOperation = 'destination-out'; // Este modo elimina lo que se dibuja
-
+            dibujarGrafico(tipo) {
+                let contenedor = document.querySelector(this.selector);
+                let lienzo = document.createElement("canvas");
+                let contexto = lienzo.getContext("2d");
+                lienzo.width = 400;
+                lienzo.height = 400;
+                contenedor.appendChild(lienzo);
+                
+                let total = this.datos.reduce((sum, dato) => sum + dato.valor, 0);
+                let anguloInicial = 0;
+                let radio = tipo === "anillo" ? 120 : 180;
+                
+                this.datos.forEach((dato, i) => {
+                    let anguloFinal = (dato.valor / total) * Math.PI * 2;
+                    contexto.fillStyle = this.colores[i];
                     contexto.beginPath();
-                    contexto.arc(anchura / 2, altura / 2, 100, 0, Math.PI * 2);
+                    contexto.moveTo(200, 200);
+                    contexto.arc(200, 200, radio, anguloInicial, anguloInicial + anguloFinal);
+                    contexto.lineTo(200, 200);
                     contexto.fill();
+                    
+                    let anguloTexto = anguloInicial + anguloFinal / 2;
+                    let x = 200 + Math.cos(anguloTexto) * (radio / 1.5);
+                    let y = 200 + Math.sin(anguloTexto) * (radio / 1.5);
+                    
+                    contexto.fillStyle = "white";
+                    contexto.font = "14px Arial";
+                    contexto.fillText(dato.texto + " (" + ((dato.valor / total) * 100).toFixed(1) + "%)", x, y);
+                    
+                    anguloInicial += anguloFinal;
+                });
+                
+                if (tipo === "anillo") {
+                    contexto.globalCompositeOperation = "destination-out";
+                    contexto.beginPath();
+                    contexto.arc(200, 200, 60, 0, Math.PI * 2);
+                    contexto.fill();
+                    contexto.globalCompositeOperation = "source-over";
+                }
+            }
+        }
 
-                    // Restaurar el modo de composición para el siguiente dibujo
-                    contexto.globalCompositeOperation = 'source-over'; // Esto es lo normal para dibujar
-				}
-			}
+        function actualizarGrafico() {
+            document.getElementById("contienegraficas").innerHTML = "";
+            let datos = [
+                { texto: "A", valor: parseInt(document.getElementById("valorA").value) },
+                { texto: "B", valor: parseInt(document.getElementById("valorB").value) },
+                { texto: "C", valor: parseInt(document.getElementById("valorC").value) },
+                { texto: "D", valor: parseInt(document.getElementById("valorD").value) }
+            ];
+            
+            let grafico = new JVGrafica(datos, "#contienegraficas");
+            grafico.dibujarGrafico("tarta");
+            grafico.dibujarGrafico("anillo");
+        }
 
-			let datos = [
-				{"texto": "porcion1", "valor": 33},
-				{"texto": "porcion2", "valor": 33},
-				{"texto": "porcion3", "valor": 33}
-			];
-			// Crear una instancia de JVGrafica y dibujar ambos gráficos
-			let nuevografico = new JVGrafica(datos, "#dc143c", "#contienegraficas");
-			nuevografico.tarta();
-			nuevografico.anillo();
-		</script>
-	</body>
+        function generarAleatorio() {
+            let valores = [];
+            let suma = 100;
+            for (let i = 0; i < 3; i++) {
+                let valor = Math.floor(Math.random() * (suma - (3 - i)) + 1);
+                valores.push(valor);
+                suma -= valor;
+            }
+            valores.push(suma);
+            
+            document.getElementById("valorA").value = valores[0];
+            document.getElementById("valorB").value = valores[1];
+            document.getElementById("valorC").value = valores[2];
+            document.getElementById("valorD").value = valores[3];
+            
+            actualizarGrafico();
+        }
+        
+        actualizarGrafico(); 
+    </script>
+</body>
 </html>

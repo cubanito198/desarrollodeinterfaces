@@ -1,140 +1,366 @@
 <style>
-	#contenedor{
-		display: flex;
-		flex-direction: row;
-		flex-wrap: nowrap;
-		justify-content: space-between;
-		align-items: stretch;
-		align-content: stretch;
-	}
-	.izquierda{
-		width:30%;
-	}
-	.derecha{
-		width:70%;
-	}
-	input[type=checkbox],p{
-		display:inline-block;
-	}
-	label{
-		width:100%;
-		display:block;
-	}
-	#contienecampos{
-		column-count:2;
-	}
-	.peticion{
-		background:black;
-		color:white;
-		padding:20px;
-		border-radius:20px;
-		font-family:monospace;
-		text-shadow:0px 0px 4px green,0px 0px 4px green,0px 0px 4px green,0px 0px 4px green;
-		margin-bottom:20px;
-	}
+/* Estilos globales */
+body {
+    font-family: 'Roboto', sans-serif; /* Fuente moderna */
+    background: url(fondo.png) no-repeat center center fixed; /* Fondo fijo que no se repite */
+    background-size: cover; /* Hace que la imagen cubra toda la pantalla */
+    color: #333; /* Color de texto oscuro */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Animación para el fondo */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Contenedor principal */
+#contenedor {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    z-index: 1; /* Asegura que el contenido se muestre sobre el fondo */
+}
+
+/* Estilos de la columna izquierda (panel de navegación) */
+.izquierda {
+    position: fixed; /* Fija el panel en la pantalla */
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 300px; /* Ancho fijo del panel */
+    background: linear-gradient(135deg, rgb(255, 255, 255), #57697c); /* Fondo degradado suave */
+    color: white; /* Texto blanco para contraste */
+    padding: 20px;
+    box-shadow: 4px 0px 10px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+    overflow-y: auto; /* Hacer scroll en el panel si se excede la altura */
+}
+
+/* Estilo para los elementos dentro del panel */
+.izquierda p, .izquierda label, .izquierda select, .izquierda input {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #000000; /* Color claro para texto en el panel */
+}
+
+/* Contenedor de la columna derecha (contenido que se mueve) */
+.derecha {
+    margin-left: 320px; /* Deja espacio suficiente para el panel fijo */
+    padding: 20px;
+    flex: 1; /* Toma el espacio restante */
+}
+
+/* Títulos y textos */
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #444;
+}
+
+/* Estilo para el desplegable de tablas */
+select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+/* Estilo para los checkboxes */
+input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+/* Estilo para el input de límite */
+#limite {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    font-size: 16px;
+}
+
+/* Petición SQL */
+.peticion {
+    background-color: #222;
+    color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-family: monospace;
+    text-align: center;
+}
+
+/* Contenedor de resultados */
+#resultadotabla {
+    margin-top: 20px;
+}
+
+/* Estilo para las tablas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #3498db;
+    color: #fff;
+}
+
+tr:nth-child(even) {
+    background-color: #f7f7f7;
+}
+
+tr:hover {
+    background-color: #e0f7ff;
+}
+
+/* Hover sobre los botones */
+button {
+    padding: 10px 20px;
+    background-color: #FFD700;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #f9e79f;
+}
+
+/* Animación de transiciones */
+input[type="checkbox"], select, #limite {
+    transition: all 0.3s ease;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 768px) {
+    #contenedor {
+        flex-direction: column;
+    }
+    
+    .izquierda, .derecha {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .izquierda {
+        position: static; /* El panel ya no será fijo en pantallas pequeñas */
+        width: 100%;
+    }
+}
+/* Estilo para el campo de búsqueda */
+#searchInput {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    margin-bottom: 20px;
+    background-color: #fff;
+}
+
+
+
+
 </style>
 <h1></h1>
 <div id="contenedor">
-	<div class="izquierda">
-		<p>1.-Selecciona la tabla para trabajar</p>
-		<select id="tablas">
-			<option>Selecciona una tabla...</option>
-		</select>
-		<p>2.-Selecciona los campos con los que quieres trabajar</p>
-		<div id="contienecampos">
-		
-		</div>
-		<p>3.-Selecciona los campos con los que quieres trabajar</p>
-		<input type="number" id="limite">
-	</div>
-	<div class="derecha">
-		<div class="peticion">
-			
-		</div>
-		<div id="resultadotabla">
-			
-		</div>
-	</div>
+    <div class="izquierda">
+        <p>1.- Selecciona la tabla para trabajar</p>
+        <select id="tablas">
+            <option>Selecciona una tabla...</option>
+        </select>
+
+        <p>2.- Selecciona los campos con los que quieres trabajar</p>
+        <div id="contienecampos"></div>
+
+        <p>3.- Limita el numero de filas a mostrar</p>
+        <input type="number" id="limite" placeholder="Numero de filas">
+
+        <!-- Campo de búsqueda para filtrar los resultados -->
+        <p>4.- Buscar en los resultados</p>
+        <input type="text" id="searchInput" placeholder="Buscar resultados...">
+    </div>
+
+    <div class="derecha">
+        <div class="peticion">
+            <!-- Aquí se mostrará la consulta SQL generada -->
+        </div>
+
+        <div id="resultadotabla">
+            <!-- Aquí se mostrarán los resultados de la tabla -->
+        </div>
+    </div>
 </div>
+
+
 <script>
-			let peticion = "SELECT "
-			let tabla = ""
-			let columnas = "*"
-			let desde = " FROM "
-			let limite = 100;
-			
-			ejecutaPeticion()
-			
-			fetch("../../servidor/?o=listatablas")
-			.then(function(response){
-				return response.json()
-			})
-			.then(function(datos){
-				datos.forEach(function(tabla){
-					let elemento = document.createElement("option")
-					elemento.value = tabla.Tables_in_crimson
-					elemento.textContent = tabla.Tables_in_crimson
-					document.querySelector("#tablas").appendChild(elemento)
-				})
-			})
-			document.querySelector("#tablas").onchange = function () {
-				 console.log("Tabla seleccionada, vamos con el siguiente paso");
-				 tabla = this.value;
-				 ejecutaPeticion()
-				 fetch("../../servidor/?o=columnastabla&tabla=" + this.value)
-					  .then(function (response) {
-						   return response.json();
-					  })
-					  .then(function (datos) {
-						   let contenedor = document.querySelector("#contienecampos");
-						   contenedor.innerHTML = ""; // Limpiar el contenedor antes de agregar nuevos elementos
-						   datos.forEach(function (dato) {
-						       let etiqueta = document.createElement("label");
-						       let elemento = document.createElement("input");
-						       elemento.setAttribute("type", "checkbox");
-						       elemento.setAttribute("name", dato.Field);
-						       elemento.classList.add("campo")
+			let peticion = "SELECT ";
+let tabla = "";
+let columnas = "*";  // Por defecto, seleccionamos todas las columnas.
+let desde = " FROM ";
+let limite = 100;  // El valor predeterminado del límite.
 
-						       // Añadir evento al checkbox
-						       elemento.onclick = function () {
-						           let campos = document.querySelectorAll(".campo")
-						           console.log(campos)
-						           columnas = ""
-						           campos.forEach(function(campo){
-						           		if(campo.checked){
-						           			columnas += campo.name+","
-						           		}
-						           })
-						           columnas = columnas.slice(0, -1);
-						           ejecutaPeticion()
-						       };
+function ejecutaPeticion() {
+    // Si no se seleccionan columnas, usamos '*' (todas las columnas)
+    if (columnas === "") {
+        columnas = "*";
+    }
 
-						       // Añadir el texto al label
-						       etiqueta.appendChild(elemento);
-						       let texto = document.createElement("p");
-						       texto.textContent = dato.Field;
-						       etiqueta.appendChild(texto);
+    // Crear la consulta SQL
+    let sql = peticion + columnas + desde + tabla;  // Construir la consulta SQL
 
-						       // Añadir el label al contenedor
-						       contenedor.appendChild(etiqueta);
-						   });
-					  });
-			};
-			function ejecutaPeticion(){
-				let sql = peticion + columnas + desde + tabla +" LIMIT "+limite
-				document.querySelector(".peticion").textContent = sql;
-				
-				fetch("ejecuta.php?sql="+encodeURI(sql))
-				.then(function (response) {
-						   return response.text();
-					  })
-					  .then(function (datos) {
-					  		document.querySelector("#resultadotabla").innerHTML = datos
-					  })
-				
-			}
-			document.querySelector("#limite").onchange = function(){
-				limite = this.value
-				ejecutaPeticion()
-			}
+    // Añadir límite si es válido
+    if (limite && !isNaN(limite) && limite > 0) {
+        sql += " LIMIT " + limite;  // Si el límite es válido, lo añadimos a la consulta
+    }
+
+    // Depurar la consulta SQL generada en la consola
+    console.log("Consulta SQL generada:", sql);
+
+    // Mostrar la consulta SQL en la interfaz
+    document.querySelector(".peticion").textContent = sql;
+
+    // Ejecutar la consulta con fetch
+    fetch("ejecuta.php?sql=" + encodeURI(sql))
+        .then(function(response) {
+            return response.text();
+        })
+        .then(function(datos) {
+            document.querySelector("#resultadotabla").innerHTML = datos;
+            addSearchFunctionality();  // Añadir la funcionalidad de búsqueda en la tabla
+        })
+        .catch(function(error) {
+            console.error("Error al ejecutar la consulta:", error);
+        });
+}
+
+// Añadir funcionalidad de búsqueda en tiempo real
+function addSearchFunctionality() {
+    let searchInput = document.getElementById("searchInput");
+    let table = document.querySelector("#resultadotabla");
+
+    searchInput.addEventListener("input", function() {
+        let filter = searchInput.value.toLowerCase();
+        let rows = table.getElementsByTagName("tr");
+
+        for (let i = 0; i < rows.length; i++) {
+            let cells = rows[i].getElementsByTagName("td");
+            let rowText = "";
+            for (let j = 0; j < cells.length; j++) {
+                rowText += cells[j].textContent.toLowerCase() + " ";  // Obtener todo el texto de la fila
+            }
+
+            if (rowText.indexOf(filter) > -1) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";  // Ocultar fila si no coincide con la búsqueda
+            }
+        }
+    });
+}
+
+// Llamada al servidor para obtener las tablas
+fetch("/segundo/interfaces/entrega%206/bi/servidor.php?o=listatablas")
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(datos) {
+        // Rellenar el desplegable con las tablas
+        datos.forEach(function(tabla) {
+            let elemento = document.createElement("option");
+            elemento.value = tabla.Tables_in_crimsonn;
+            elemento.textContent = tabla.Tables_in_crimsonn;
+            document.querySelector("#tablas").appendChild(elemento);
+        });
+    });
+
+// Cambio en la selección de tabla
+document.querySelector("#tablas").onchange = function () {
+    console.log("Tabla seleccionada:", this.value); // Verifica qué se está mostrando aquí
+    tabla = this.value;
+    ejecutaPeticion();
+    fetch("/segundo/interfaces/entrega%206/bi/servidor.php?o=columnastabla&tabla=" + this.value)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (datos) {
+            let contenedor = document.querySelector("#contienecampos");
+            contenedor.innerHTML = ""; // Limpiar el contenedor antes de agregar nuevos elementos
+            datos.forEach(function (dato) {
+                let etiqueta = document.createElement("label");
+                let elemento = document.createElement("input");
+                elemento.setAttribute("type", "checkbox");
+                elemento.setAttribute("name", dato.Field);
+                elemento.classList.add("campo");
+
+                // Añadir evento al checkbox
+                elemento.onclick = function () {
+                    let campos = document.querySelectorAll(".campo");
+                    console.log(campos);
+                    columnas = "";
+                    campos.forEach(function (campo) {
+                        if (campo.checked) {
+                            columnas += campo.name + ",";
+                        }
+                    });
+                    columnas = columnas.slice(0, -1);
+                    ejecutaPeticion();
+                };
+
+                // Añadir el texto al label
+                etiqueta.appendChild(elemento);
+                let texto = document.createElement("p");
+                texto.textContent = dato.Field;
+                etiqueta.appendChild(texto);
+
+                // Añadir el label al contenedor
+                contenedor.appendChild(etiqueta);
+            });
+        });
+};
+
+// Cambiar el límite de filas
+document.querySelector("#limite").onchange = function () {
+    limite = this.value;
+    ejecutaPeticion();  // Ejecutar la consulta con el nuevo límite
+};
+
+
 		</script>

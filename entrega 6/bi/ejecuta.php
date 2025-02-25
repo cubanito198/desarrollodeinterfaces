@@ -1,42 +1,83 @@
 <style>
-    body {
+   body {
         font-family: Arial, sans-serif;
+        background-color: #f4f4f4; /* Color de fondo claro */
         margin: 20px;
-        background-color: #f9f9f9;
+        padding: 0;
+        color: #333; /* Texto oscuro para buen contraste */
     }
+
+    /* Estilo de la tabla */
     table {
         width: 100%;
         border-collapse: collapse;
         margin-bottom: 20px;
-        background-color: #ffffff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff; /* Fondo blanco */
+        border-radius: 12px; /* Bordes redondeados */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+        overflow: hidden; /* Asegura que los bordes redondeados se vean bien */
     }
+
+    /* Estilo de las celdas de la tabla */
     th, td {
         padding: 12px;
         text-align: left;
-        border: 1px solid #ddd;
+        border: 1px solid #ddd; /* Borde gris suave */
+        color: #555; /* Color de texto más suave */
     }
+
+    /* Estilo para los encabezados de la tabla */
     th {
-        background-color: crimson;
-        color: white;
+        background-color: #333; /* Fondo oscuro para el encabezado */
+        color: #fff; /* Texto blanco */
+        font-weight: bold; /* Negrita para los encabezados */
     }
+
+    /* Estilo de las filas alternas */
     tr:nth-child(even) {
-        background-color: #f2f2f2;
+        background-color: #f9f9f9; /* Fondo gris claro para filas alternas */
     }
+
+    /* Hover sobre las filas */
     tr:hover {
-        background-color: #eaf4ff;
+        background-color: #eaeaea; /* Fondo ligeramente gris para el hover */
     }
+
+    /* Estilo para el número de fila */
     .row-number {
         font-weight: bold;
         text-align: center;
+        color: #777; /* Color gris para el número de fila */
+    }
+
+    /* Botón de descarga */
+    button {
+        background-color: #FFD700; /* Azul elegante */
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 30px; /* Bordes redondeados */
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #f9e79f; /* Color más oscuro al pasar el ratón */
+    }
+
+    /* Formulario con borde redondeado */
+    form {
+        display: inline-block;
+        margin-top: 20px;
     }
 </style>
 <?php
 // Database connection details
 $host = "localhost";
-$username = "crimson";
-$password = "crimson";
-$database = "crimson";
+$username = "luisss";
+$password = "luis";
+$database = "crimsonn";
 
 // Create connection
 $conn = new mysqli($host, $username, $password, $database);

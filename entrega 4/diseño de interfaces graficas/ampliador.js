@@ -1,59 +1,78 @@
-// Definimos variables iniciales
-let tamanio = 1;  // Tamaño inicial de la fuente
-let cantidadcontraste = 1;  // Valor inicial del contraste
-let contenedor = document.createElement("div");  // Creamos un contenedor para los botones
-contenedor.classList.add("jvampliador");  // Le agregamos una clase CSS para el estilo
+// Referencias comunes
+const body = document.querySelector("body");
 
-////////////////// AUMENTAR /////////////////
+// Variables
+let tamanio = 0.50;  
+let cantidadContraste = 100;  
 
-// Creamos el botón de aumentar el tamaño de fuente
-let aumentar = document.createElement("button");
-aumentar.textContent = "+";  // El texto del botón será "+"
-contenedor.appendChild(aumentar);  // Agregamos el botón al contenedor
+// Crear contenedor de botones
+let contenedor = document.createElement("div");
+contenedor.classList.add("jvampliador");
 
-// Asignamos una acción al botón de aumentar
-aumentar.onclick = function() {
-    tamanio *= 1.1;  // Aumentamos el tamaño de la fuente en un 10% cada vez
-    document.querySelector("body").style.fontSize = tamanio + "em";  // Aplicamos el nuevo tamaño al cuerpo de la página
+// Función para crear botones con eventos
+function crearBoton(texto, titulo, accion) {
+    let boton = document.createElement("button");
+    boton.textContent = texto;
+    boton.title = titulo; // Tooltip
+    boton.onclick = accion;
+    contenedor.appendChild(boton);
 }
-
-////////////////// CONTRASTE /////////////////
-
-// Creamos el botón de cambiar el contraste
-let contraste = document.createElement("button");
-contraste.textContent = "C";  // El texto del botón será "C"
-contenedor.appendChild(contraste);  // Agregamos el botón al contenedor
-
-// Asignamos una acción al botón de cambiar contraste
-contraste.onclick = function() {
-    cantidadcontraste = 80;  // Establecemos un valor de contraste a un 80%
-    document.querySelector("body").style.filter = "contrast(" + cantidadcontraste + "%)";  // Aplicamos el filtro de contraste
+// Función para actualizar el tamaño de la fuente
+function actualizarTamanio() {
+    body.style.fontSize = `${tamanio}cm`;
+    actualizarEstado();
 }
+// Etiqueta para mostrar valores
+let estado = document.createElement("div");
+estado.classList.add("estado");
+actualizarEstado();
 
-////////////////// INVERTIR /////////////////
+// Aumentar fuente en pasos de 0.10 cm
+crearBoton("+", "Aumentar tamaño", function() {
+    tamanio = parseFloat(tamanio) + 0.10; // Convertimos a número y sumamos
+    if (tamanio > 2.0) tamanio = 2.0; // Límite superior en 2.0 cm
+    actualizarTamanio();
+});
 
-// Creamos el botón de invertir los colores
-let invertir = document.createElement("button");
-invertir.textContent = "I";  // El texto del botón será "I"
-contenedor.appendChild(invertir);  // Agregamos el botón al contenedor
+// Disminuir fuente en pasos de 0.10 cm
+crearBoton("-", "Disminuir tamaño", function() {
+    tamanio = parseFloat(tamanio) - 0.10; // Convertimos a número y restamos
+    if (tamanio < 0.10) tamanio = 0.10; // Límite inferior en 0.10 cm
+    actualizarTamanio();
+});
 
-// Asignamos una acción al botón de invertir
-invertir.onclick = function() {
-    document.querySelector("body").style.filter = "invert(1)";  // Aplicamos un filtro para invertir los colores
+
+
+// Alternar contraste entre 100%, 80% y 120%
+crearBoton("C", "Ajustar contraste", function() {
+    cantidadContraste += 10;
+    if (cantidadContraste > 100) {
+        cantidadContraste = 10; // Reinicia a 10% después de 100%
+    }
+    body.style.filter = `contrast(${cantidadContraste}%)`;
+    actualizarEstado();
+});
+
+
+// Invertir colores con toggle
+crearBoton("I", "Invertir colores", function() {
+    let filtroActual = body.style.filter;
+
+    if (filtroActual.includes("invert(1)")) {
+        body.style.filter = filtroActual.replace("invert(1)", "").trim();
+    } else {
+        body.style.filter += " invert(1)";
+    }
+});
+
+
+
+
+// Agregar contenedor y estado al body
+contenedor.appendChild(estado);
+body.appendChild(contenedor);
+
+// Función para actualizar el estado en pantalla
+function actualizarEstado() {
+    estado.textContent = `Tamaño: ${tamanio.toFixed(2)}cm | Contraste: ${cantidadContraste}%`;
 }
-
-////////////////// DISMINUIR /////////////////
-
-// Creamos el botón de disminuir el tamaño de fuente
-let disminuir = document.createElement("button");
-disminuir.textContent = "-";  // El texto del botón será "-"
-contenedor.appendChild(disminuir);  // Agregamos el botón al contenedor
-
-// Asignamos una acción al botón de disminuir
-disminuir.onclick = function() {
-    tamanio *= 0.9;  // Disminuimos el tamaño de la fuente en un 10% cada vez
-    document.querySelector("body").style.fontSize = tamanio + "em";  // Aplicamos el nuevo tamaño al cuerpo de la página
-}
-
-// Finalmente, agregamos el contenedor con todos los botones al cuerpo de la página
-document.querySelector("body").appendChild(contenedor);

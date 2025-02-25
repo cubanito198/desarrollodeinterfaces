@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Clientes - Estilo Automovilístico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: url('fondo.png') no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            color: white;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #ff0000;
+            color: white;
+            cursor: pointer;
+        }
+        tbody tr:hover {
+            background: #222;
+        }
+        .search-box, .add-client {
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .add-client {
+            background: #ff0000;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .dropdown {
+            margin-top: 10px;
+        }
+        .dropdown select {
+            padding: 8px;
+            border: none;
+            background: #ff0000;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: black;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(255, 0, 0, 0.8);
+            border-radius: 10px;
+            color: white;
+        }
+        .modal input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ff0000;
+            background: #222;
+            color: white;
+        }
+        .modal button {
+            padding: 10px 15px;
+            background: #ff0000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .modal input{
+            width: 97%;
+        }
+        .container input{
+            width: 96%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="text" id="search" class="search-box" placeholder="Buscar en la tabla...">
+        <button class="add-client" onclick="document.getElementById('modal').style.display='block'">Añadir Cliente</button>
+        <div class="dropdown">
+            <select id="sort-options" onchange="sortTable()">
+                <option value="">Ordenar por...</option>
+                <option value="id-asc">ID Ascendente</option>
+                <option value="id-desc">ID Descendente</option>
+                <option value="name-asc">Nombre A-Z</option>
+                <option value="name-desc">Nombre Z-A</option>
+            </select>
+        </div>
+        <table id="tabla">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Email</th>
+                    <th>Pais</th>
+                    <th>Direccion</th>
+                    <th>Poblacion</th>
+                    <th>Codigo postal</th> 
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div id="modal" class="modal">
+        <h2>Añadir Cliente</h2>
+        <label>Nombre: <input type="text" id="name"></label>
+        <label>Apellidos: <input type="text" id="lastname"></label>
+        <label>Email: <input type="email" id="email"></label>
+        <label>Dirección: <input type="text" id="address"></label>
+        <label>Poblacion: <input type="text" id="population"></label>
+        <label>Codigo postal: <input type="text" id="zip_code"></label>
+        <label>Pais: <input type="text" id="country"></label>
+        <button onclick="addClient()">Guardar</button>
+        <button onclick="document.getElementById('modal').style.display='none'">Cerrar</button>
+    </div>
+    <script>
+        function addClient() {
+            let client = {
+                name: document.getElementById("name").value,
+                lastname: document.getElementById("lastname").value,
+                email: document.getElementById("email").value,
+                address: document.getElementById("address").value,
+                population: document.getElementById("population").value,
+                zip_code: document.getElementById("zip_code").value,
+                country: document.getElementById("country").value
+            };
+    
+            console.log("Enviando datos:", client);
+    
+            fetch('guardar_cliente.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(client)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Respuesta del servidor:", data);
+                alert("Cliente guardado correctamente");
+            })
+            .catch(error => console.error("Error al guardar cliente:", error));
+    
+            document.getElementById("modal").style.display = "none";
+        }
+    
+        document.getElementById("search").addEventListener("keyup", function() {
+            let searchValue = this.value.toLowerCase();
+            let tableBody = document.querySelector("#tabla tbody");
+
+             // Si el campo de búsqueda está vacío, limpiar la tabla y salir
+                    if (searchValue === "") {
+                        tableBody.innerHTML = "";
+                        return;
+                    }
+    
+            fetch('cargar_clientes.php')
+                .then(response => response.json())
+                .then(data => {
+                    let tableBody = document.querySelector("#tabla tbody");
+                    tableBody.innerHTML = "";
+    
+                    data.forEach(client => {
+                        let fullName = `${client.nombre} ${client.apellidos}`.toLowerCase();
+                        let email = client.email.toLowerCase();
+                        let address = client.direccion.toLowerCase();
+                        
+                        if (fullName.includes(searchValue) || email.includes(searchValue) || address.includes(searchValue)) {
+                            let row = tableBody.insertRow();
+                            row.insertCell(0).textContent = client.id;
+                            row.insertCell(1).textContent = client.nombre;
+                            row.insertCell(2).textContent = client.apellidos;
+                            row.insertCell(3).textContent = client.email;
+                            row.insertCell(4).textContent = client.direccion;
+                            row.insertCell(5).textContent = client.poblacion;
+                            row.insertCell(6).textContent = client.cp;
+                            row.insertCell(4).textContent = client.pais;
+                        }
+                    });
+                })
+                .catch(error => console.error("Error cargando clientes:", error));
+        });
+    
+          function sortTable() {
+        let table = document.getElementById("tabla");
+        let tableBody = table.querySelector("tbody");
+        let rows = Array.from(tableBody.querySelectorAll("tr"));
+        let option = document.getElementById("sort-options").value;
+        
+        let columnIndex = 0;
+        if (option.includes("name")) columnIndex = 1;
+        if (option.includes("email")) columnIndex = 2;
+        if (option.includes("address")) columnIndex = 4;
+        
+        let asc = option.includes("asc");
+        
+        rows.sort((a, b) => {
+            let valA = a.cells[columnIndex].textContent.toLowerCase();
+            let valB = b.cells[columnIndex].textContent.toLowerCase();
+            return asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        });
+        
+        tableBody.innerHTML = "";
+        rows.forEach(row => tableBody.appendChild(row));
+    }
+    </script>
+    
+</body>
+</html>
